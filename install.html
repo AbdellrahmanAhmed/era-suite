@@ -1002,7 +1002,7 @@ office:[
 install:[
  {label:'مين راح',q:'مين اللي راح الموقع؟',hint:'اسمك — عشان يبان في السجل المشترك',f:[{k:'__who',type:'whoquick'},{k:'reporter',type:'text',label:'الاسم',ph:'م. ...'},{k:'date',type:'date',label:'تاريخ الزيارة'}]},
  {label:'النوع',q:'نوع التقرير',f:[{k:'visitType',type:'chips',opts:VISIT}]},
- {label:'الموقع',q:'اسم الموقع',hint:'اسم المشروع أو الكمبوند + رقم الوحدة',f:[{k:'__p',type:'place'},{k:'site',type:'text',ph:'مدينتي [فيلا 76 مجموعة 10]'}]},
+ {label:'الموقع',q:'اختار الموقع',hint:'المواقع المتاحة اللي فتحها التيكنيكال أوفيس',f:[{k:'site',type:'sitesel',req:1}]},
  {label:'المهندس',q:'المهندس المسؤول',f:[{k:'engineer',type:'text',label:'الاسم',ph:'م. رنا لبيب'},{k:'phone',type:'text',label:'رقم التواصل',ph:'01xxxxxxxxx'}]},
  {label:'الحالة',q:'مختصر حالة الموقع',f:[{k:'brief',type:'text',ph:'متبقي / منتهي بفضل الله'},{k:'__b',type:'quick',target:'brief',opts:BRIEF}]},
  {label:'اللوكيشن',q:'رابط الموقع الجغرافي',f:[{k:'map',type:'gps'}]},
@@ -1019,7 +1019,7 @@ install:[
 ],
 maint:[
  {label:'العميل',q:'بيانات العميل',f:[{k:'client',type:'text',label:'اسم العميل',ph:'م. رنا لبيب'},{k:'phone',type:'text',label:'رقم التليفون',ph:'011 00078451'}]},
- {label:'الموقع',q:'الموقع وتاريخ الاستلام',f:[{k:'__p',type:'place'},{k:'site',type:'text',label:'المشروع / الموقع',ph:'فيلا م. رنا لبيب — مدينتي'},
+ {label:'الموقع',q:'الموقع وتاريخ الاستلام',f:[{k:'site',type:'sitesel',req:1},
    {k:'date',type:'date',label:'تاريخ الاستلام'},{k:'engineer',type:'text',label:'مهندس الموقع (المُسلِّم)',ph:'م. ...'}]},
  {label:'اللوكيشن',q:'لينك لوكيشن الموقع',hint:'بيتحول QR في الـPDF',f:[{k:'map',type:'gps'}]},
  {label:'الشكوى',q:'مختصر شكوى العميل',f:[{k:'complaint',type:'area',ph:'عدد من مفاتيح الميني محروقة نتيجة زيادة كهرباء'}]},
@@ -1178,6 +1178,25 @@ function unitsHTML(d){
 }
 function fieldHTML(f,d){
   const v=d[f.k], lab=f.label?'<label class="lb">'+f.label+'</label>':'';
+  if(f.type==='sitesel'){
+    const keys=Object.keys(knownSites()).sort();
+    if(!keys.length)
+      return '<div class="empty"><b>مفيش مواقع متاحة</b>كلّم التيكنيكال أوفيس عشان يفتح الموقع الأول</div>';
+    const info=store.sites[d.site]||{};
+    let out='<select id="f_site"><option value="">— اختار الموقع —</option>'+
+      keys.map(function(k){ return '<option value="'+esc(k)+'"'+(d.site===k?' selected':'')+'>'+esc(k)+'</option>'; }).join('')+
+      '</select>';
+    if(has(d.site)){
+      let bits=[];
+      if(has(info.engineer)) bits.push('👤 '+esc(info.engineer));
+      if(has(info.phone)) bits.push('📞 '+esc(info.phone));
+      if(has(info.client)) bits.push('🏠 '+esc(info.client));
+      if(has(info.map)) bits.push('<a href="'+esc(info.map)+'" target="_blank" rel="noopener" style="color:var(--accent)">📍 اللوكيشن</a>');
+      if(bits.length) out+='<div class="hint" style="margin-top:8px">'+bits.join(' · ')+'</div>';
+    }
+    out+='<div class="hint" style="margin-top:8px">مش لاقي الموقع؟ التيكنيكال أوفيس بس اللي بيضيف مواقع جديدة.</div>';
+    return out;
+  }
   if(f.type==='place') return placeHTML(d);
   if(f.type==='units') return unitsHTML(d);
   if(f.type==='gps')
@@ -1246,6 +1265,12 @@ function saveInputs(){
     if(el) cur.data[f.type==='gps'?'map':f.k]=el.value.trim();
   });
 }
+stepBody.addEventListener('change',function(ev){
+  if(ev.target && ev.target.id==='f_site'){
+    cur.data.site=ev.target.value;
+    renderStep();
+  }
+});
 stepBody.addEventListener('input',function(ev){
   const u=ev.target.closest('[data-ui]'); if(!u) return;
   const i=+u.getAttribute('data-ui'), f=u.getAttribute('data-uf');
@@ -1274,7 +1299,12 @@ stepBody.addEventListener('click',function(ev){
   }else cur.data[k]=(cur.data[k]===v)?'':v;
   renderStep();
 });
-function nextStep(){ saveInputs(); if(cur.i<cur.steps.length-1){ cur.i++; renderStep(); } else finish(); }
+function nextStep(){
+  saveInputs();
+  const miss=vis(cur.steps[cur.i],cur.data).filter(function(f){ return f.req && !has(cur.data[f.k]); });
+  if(miss.length){ toast('اختار الموقع الأول'); return; }
+  if(cur.i<cur.steps.length-1){ cur.i++; renderStep(); } else finish();
+}
 function backStep(){ saveInputs(); if(cur.i>0){ cur.i--; renderStep(); } else go('pick'); }
 
 async function finish(){
