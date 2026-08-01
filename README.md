@@ -158,7 +158,8 @@ Provided as-is for internal use at ERA Solutions. Fork and adapt freely for your
 ## ✍️ Author
 
 **م. عبدالرحمن أحمد عبدالدايم**
-*Eng. Abdelrahman Ahmed Abdeldayem*
+
+*Eng. ABDELRAHMAN AHMED ABDELDAIM*
 Smart Home & Automation Engineer — Technical Office, ERA Solutions
 
 🔗 [linkedin.com/in/engabdaim](https://www.linkedin.com/in/engabdaim)
