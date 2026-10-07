@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERA Solutions - Smart Home Site Survey & Inspection</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Cairo & Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- html2pdf.js for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        era: {
+                            navy: '#0b1329',
+                            dark: '#060a17',
+                            card: '#111a33',
+                            gold: '#d4af37',
+                            goldHover: '#b89628',
+                            cyan: '#06b6d4',
+                            cyanHover: '#0891b2',
+                            lightBg: '#f1f5f9'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0b1329;
+            color: #f1f5f9;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fce080 0%, #d4af37 50%, #997b15 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cyan-gradient-text {
+            background: linear-gradient(135deg, #67e8f9 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060a17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background-color: white !important;
+                color: black !important;
+                font-size: 10pt;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+        }
+        .print-only {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-era-cyan selection:text-era-dark">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-era-dark/95 backdrop-blur border-b border-slate-800 text-white sticky top-0 z-50 no-print shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            
+            <!-- ERA Brand Logo Direct CDN -->
+            <div class="flex items-center gap-3">
+                <img src="https://lh3.googleusercontent.com/d/1Rsn8lWfVI492q9HtsHTBlk6cjzKTolFN" 
+                     onerror="this.src='https://drive.google.com/uc?export=view&id=1Rsn8lWfVI492q9HtsHTBlk6cjzKTolFN';" 
+                     alt="Era Solutions Logo" class="h-10 w-auto object-contain">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-black tracking-wider font-montserrat text-lg text-white">ERA</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-era-gold/20 text-era-gold border border-era-gold/30">SOLUTIONS</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 leading-none mt-0.5">Smart Home & Automation Systems</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center gap-2">
+                <button onclick="openHistoryModal()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-era-cyan border border-era-cyan/30 rounded-lg transition flex items-center gap-1.5 font-semibold">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span class="hidden sm:inline">السجلات المحفوظة</span>
+                </button>
+                <button onclick="saveToLocalStorage(true)" class="px-3 py-1.5 text-xs bg-era-gold/20 hover:bg-era-gold/30 text-era-gold border border-era-gold/40 rounded-lg transition flex items-center gap-1.5 font-semibold">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span class="hidden sm:inline">حفظ مسودة</span>
+                </button>
+                <button onclick="clearFormWithConfirmation()" class="px-3 py-1.5 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span class="hidden sm:inline">جديد</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- Stepper Navigation -->
+        <div class="no-print mb-6 bg-era-card/80 backdrop-blur rounded-2xl border border-slate-800 p-4 shadow-xl">
+            <div class="flex items-center justify-between max-w-4xl mx-auto relative">
+                
+                <!-- Step 1 Button -->
+                <button id="step-btn-1" onclick="switchStep(1)" class="flex flex-col items-center gap-1.5 z-10 group focus:outline-none">
+                    <div id="step-icon-1" class="w-10 h-10 rounded-xl bg-era-gold text-era-dark font-extrabold flex items-center justify-center shadow-lg shadow-era-gold/20 transition-all group-hover:scale-105">
+                        1
+                    </div>
+                    <span class="text-xs font-bold text-era-gold">بيانات المعاينة والوحدة</span>
+                </button>
+
+                <div id="connector-1" class="flex-1 h-0.5 bg-slate-800 -mx-2 transition-colors"></div>
+
+                <!-- Step 2 Button -->
+                <button id="step-btn-2" onclick="switchStep(2)" class="flex flex-col items-center gap-1.5 z-10 group focus:outline-none">
+                    <div id="step-icon-2" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 font-bold flex items-center justify-center shadow-sm transition-all group-hover:scale-105">
+                        2
+                    </div>
+                    <span class="text-xs font-medium text-slate-400">تحديد الفراغات (Zones)</span>
+                </button>
+
+                <div id="connector-2" class="flex-1 h-0.5 bg-slate-800 -mx-2 transition-colors"></div>
+
+                <!-- Step 3 Button -->
+                <button id="step-btn-3" onclick="switchStep(3)" class="flex flex-col items-center gap-1.5 z-10 group focus:outline-none">
+                    <div id="step-icon-3" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 font-bold flex items-center justify-center shadow-sm transition-all group-hover:scale-105">
+                        3
+                    </div>
+                    <span class="text-xs font-medium text-slate-400">تخصيص المواصفات</span>
+                </button>
+
+                <div id="connector-3" class="flex-1 h-0.5 bg-slate-800 -mx-2 transition-colors"></div>
+
+                <!-- Step 4 Button -->
+                <button id="step-btn-4" onclick="switchStep(4)" class="flex flex-col items-center gap-1.5 z-10 group focus:outline-none">
+                    <div id="step-icon-4" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 font-bold flex items-center justify-center shadow-sm transition-all group-hover:scale-105">
+                        4
+                    </div>
+                    <span class="text-xs font-medium text-slate-400">التقرير وPDF</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== STEP 1: ENGINEER, CLIENT & UNIT DETAILS ==================== -->
+        <section id="step-1" class="step-content space-y-6">
+            <div class="bg-era-card border border-slate-800 p-6 rounded-2xl shadow-2xl">
+                <div class="border-b border-slate-800 pb-4 mb-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-user-gear text-era-gold"></i>
+                            بيانات العميل والمعاينة الميدانية
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">أدخل معلومات مهندس الشركة والعميل لتخصيص جدول معاينة ERA Solutions</p>
+                    </div>
+                    <span class="text-xs font-semibold px-3 py-1 bg-era-cyan/10 text-era-cyan border border-era-cyan/20 rounded-full">الخطوة 1 من 4</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Engineer Name -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">اسم مهندس المعاينة <span class="text-era-gold">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                                <i class="fa-solid fa-user-check"></i>
+                            </span>
+                            <input type="text" id="engineerName" onchange="autoSave()" class="w-full pr-10 pl-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-era-gold focus:border-era-gold outline-none text-sm text-white placeholder-slate-500" placeholder="م. أحمد علي">
+                        </div>
+                    </div>
+
+                    <!-- Client Name -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">اسم العميل <span class="text-era-gold">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" id="clientName" onchange="autoSave()" class="w-full pr-10 pl-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-era-gold focus:border-era-gold outline-none text-sm text-white placeholder-slate-500" placeholder="اسم العميل الكامل">
+                        </div>
+                    </div>
+
+                    <!-- Unit Address -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">عنوان الوحدة <span class="text-era-gold">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </span>
+                            <input type="text" id="unitAddress" onchange="autoSave()" class="w-full pr-10 pl-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-era-gold focus:border-era-gold outline-none text-sm text-white placeholder-slate-500" placeholder="المحافظة، الحي، رقم المبنى">
+                        </div>
+                    </div>
+
+                    <!-- Unit Type Dropdown -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">نوع الوحدة (Unit Type) <span class="text-era-gold">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                                <i class="fa-solid fa-building"></i>
+                            </span>
+                            <select id="unitType" onchange="handleUnitTypeChange(); autoSave();" class="w-full pr-10 pl-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-era-gold focus:border-era-gold outline-none text-sm text-white">
+                                <option value="Apartment">شقة (Apartment)</option>
+                                <option value="Duplex">دوبلكس (Duplex)</option>
+                                <option value="Villa 3 Floors">فيلا 3 أدوار (Villa 3 Floors)</option>
+                                <option value="Villa 4 Floors">فيلا 4 أدوار (Villa 4 Floors)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button onclick="switchStep(2)" class="px-6 py-2.5 bg-gradient-to-r from-era-gold to-yellow-600 hover:from-yellow-500 hover:to-era-gold text-era-dark font-bold rounded-xl transition shadow-lg shadow-era-gold/10 flex items-center gap-2 text-sm">
+                        التالي: تحديد الفراغات (Zones)
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== STEP 2: ZONES SELECTION ==================== -->
+        <section id="step-2" class="step-content hidden space-y-6">
+            <div class="bg-era-card border border-slate-800 p-6 rounded-2xl shadow-2xl">
+                <div class="border-b border-slate-800 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-era-cyan"></i>
+                            تحديد مناطق وفراغات المبنى (Zones)
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">اختر الفراغات المتاحة بالوحدة لتطبيق أنظمة التحكم والأتمتة الذكية</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="selectAllZones(true)" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-lg border border-slate-700 transition">
+                            <i class="fa-solid fa-check-double me-1 text-era-cyan"></i> تحديد الكل
+                        </button>
+                        <button onclick="selectAllZones(false)" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-lg border border-slate-700 transition">
+                            <i class="fa-solid fa-xmark me-1 text-red-400"></i> إلغاء الكل
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Zone Adder -->
+                <div class="mb-6 p-4 bg-slate-900/80 rounded-xl border border-slate-800 flex flex-col sm:flex-row gap-3 items-end">
+                    <div class="flex-grow w-full">
+                        <label class="block text-xs font-bold text-slate-300 mb-1.5">إضافة منطقة خاصة (Custom Zone)</label>
+                        <input type="text" id="customZoneInput" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-white focus:ring-2 focus:ring-era-cyan outline-none" placeholder="مثال: Roof Garden, Cinema Room, Gym...">
+                    </div>
+                    <button onclick="addCustomZone()" class="w-full sm:w-auto px-5 py-2 bg-era-cyan hover:bg-era-cyanHover text-era-dark rounded-lg text-sm font-extrabold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> إضافة المنطقة
+                    </button>
+                </div>
+
+                <!-- Zones Checklist Grid -->
+                <div id="zonesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Dynamic rendering via JS -->
+                </div>
+
+                <div class="mt-8 flex justify-between items-center border-t border-slate-800 pt-6">
+                    <button onclick="switchStep(1)" class="px-5 py-2.5 border border-slate-700 text-slate-300 hover:bg-slate-800 font-semibold rounded-xl transition text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                        السابق
+                    </button>
+                    <button onclick="validateAndProceedToStep3()" class="px-6 py-2.5 bg-gradient-to-r from-era-gold to-yellow-600 hover:from-yellow-500 hover:to-era-gold text-era-dark font-bold rounded-xl transition shadow-lg flex items-center gap-2 text-sm">
+                        التالي: تخصيص الأجهزة والمواصفات
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== STEP 3: ZONE DETAILS & CONFIGURATION ==================== -->
+        <section id="step-3" class="step-content hidden space-y-6">
+            <div class="bg-era-card border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+                
+                <div class="bg-slate-950 p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-era-cyan"></i>
+                            تفاصيل أجهزة وأتمتة المناطق
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">قم بتحديد كافة العلب، خطوط الإضاءة، الشاشات، الستائر والحساسات بكل فراغ</p>
+                    </div>
+                </div>
+
+                <!-- Zone Tabs Horizontal Scroll Bar -->
+                <div class="bg-slate-900 border-b border-slate-800 px-4 pt-3 overflow-x-auto flex space-x-2 space-x-reverse" id="zoneTabsList">
+                    <!-- Dynamic Tabs Rendered Here -->
+                </div>
+
+                <!-- Active Zone Form Content Container -->
+                <div id="zoneTabContent" class="p-6">
+                    <!-- Active Zone Form HTML injected dynamically -->
+                </div>
+
+                <div class="p-6 bg-slate-950 border-t border-slate-800 flex justify-between items-center">
+                    <button onclick="switchStep(2)" class="px-5 py-2.5 border border-slate-700 text-slate-300 hover:bg-slate-800 font-semibold rounded-xl transition text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                        تعديل اختيار الفراغات
+                    </button>
+                    <button onclick="switchStep(4)" class="px-6 py-2.5 bg-gradient-to-r from-era-gold to-yellow-600 hover:from-yellow-500 hover:to-era-gold text-era-dark font-bold rounded-xl transition shadow-lg flex items-center gap-2 text-sm">
+                        التالي: ملخص المعاينة والتقرير
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== STEP 4: NOTES & PDF EXPORT ==================== -->
+        <section id="step-4" class="step-content hidden space-y-6">
+            
+            <!-- Additional Notes Input Section -->
+            <div class="bg-era-card border border-slate-800 p-6 rounded-2xl shadow-2xl no-print">
+                <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-list text-era-gold"></i>
+                    ملاحظات الفحص الميداني والمواصفات المتقدمة
+                </h2>
+                <p class="text-xs text-slate-400 mb-4">أدخل أي ملحوظات كهربائية أو شروط تنفيذ خاصة بـ ERA Solutions لهذا الموقع</p>
+
+                <textarea id="additionalNotes" onchange="autoSave()" rows="4" class="w-full p-4 bg-slate-950 border border-slate-800 rounded-xl focus:ring-2 focus:ring-era-gold outline-none text-sm text-white placeholder-slate-600 leading-relaxed" placeholder="أدخل الملاحظات والتوصيات الفنية هنا..."></textarea>
+                
+                <div class="mt-6 flex flex-wrap justify-between items-center gap-4">
+                    <button onclick="switchStep(3)" class="px-5 py-2.5 border border-slate-700 text-slate-300 hover:bg-slate-800 font-semibold rounded-xl transition text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                        الرجوع للتحكم بالفراغات
+                    </button>
+
+                    <div class="flex items-center gap-3">
+                        <button onclick="saveCurrentSurveyToDatabase()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-era-cyan border border-era-cyan/30 font-bold rounded-xl transition text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-database"></i>
+                            حفظ بقاعدة البيانات
+                        </button>
+                        <button onclick="exportToPDF()" class="px-6 py-2.5 bg-era-gold hover:bg-yellow-500 text-era-dark font-extrabold rounded-xl transition shadow-lg flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            تصدير تقرير المعاينة PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Printable PDF Report Document -->
+            <div id="pdfExportContainer" class="bg-white text-slate-900 p-8 rounded-2xl shadow-xl border border-slate-200">
+                
+                <!-- PDF Header with Brand Logo -->
+                <div class="border-b-2 border-slate-900 pb-4 mb-6 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <img src="https://lh3.googleusercontent.com/d/1Rsn8lWfVI492q9HtsHTBlk6cjzKTolFN" 
+                             onerror="this.src='https://drive.google.com/uc?export=view&id=1Rsn8lWfVI492q9HtsHTBlk6cjzKTolFN';" 
+                             alt="Era Solutions Logo" class="h-12 w-auto object-contain">
+                        <div>
+                            <h1 class="text-2xl font-black tracking-tight text-slate-900 font-montserrat">ERA SOLUTIONS</h1>
+                            <p class="text-xs text-slate-600 font-semibold uppercase tracking-wider">Smart Home & Automation Solutions</p>
+                        </div>
+                    </div>
+                    <div class="text-left text-xs text-slate-700 leading-tight">
+                        <p class="font-bold text-sm text-slate-900 mb-1">تقرير معاينة وتصميم الموقع</p>
+                        <p><span class="font-semibold">التاريخ:</span> <span id="reportDate">--</span></p>
+                        <p><span class="font-semibold">مهندس المعاينة:</span> <span id="reportEngineerName" class="font-bold text-slate-900">--</span></p>
+                    </div>
+                </div>
+
+                <!-- Client & Property Details Grid -->
+                <div class="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 text-xs">
+                    <div>
+                        <span class="text-slate-500 font-semibold block">اسم العميل:</span>
+                        <span id="reportClientName" class="font-bold text-slate-900 text-sm">--</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 font-semibold block">عنوان الوحدة:</span>
+                        <span id="reportUnitAddress" class="font-bold text-slate-900 text-sm">--</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 font-semibold block">نوع الوحدة:</span>
+                        <span id="reportUnitType" class="font-bold text-amber-700 text-sm">--</span>
+                    </div>
+                </div>
+
+                <!-- Zone Breakdown Summary Table -->
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-right text-[11px] border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900 text-white text-center">
+                                <th class="p-2 border border-slate-700">الفراغ (Zone)</th>
+                                <th class="p-2 border border-slate-700">Lighting / Wall Boxes</th>
+                                <th class="p-2 border border-slate-700">Bed Panels</th>
+                                <th class="p-2 border border-slate-700">Shutters / Curtains</th>
+                                <th class="p-2 border border-slate-700">Curtain Tracks (m)</th>
+                                <th class="p-2 border border-slate-700">AC Units</th>
+                                <th class="p-2 border border-slate-700">Sensors</th>
+                                <th class="p-2 border border-slate-700">Touch / Voice</th>
+                                <th class="p-2 border border-slate-700">Network</th>
+                                <th class="p-2 border border-slate-700">Sound System</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody" class="divide-y divide-slate-200">
+                            <!-- Dynamic summary rows -->
+                        </tbody>
+                        <tfoot id="summaryTableFoot" class="bg-slate-100 font-bold border-t-2 border-slate-900 text-center">
+                            <!-- Aggregated Totals Row -->
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Additional Notes Summary -->
+                <div class="mt-4 border-t border-slate-200 pt-4">
+                    <h3 class="font-bold text-slate-900 text-xs mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-comment-dots text-amber-600"></i>
+                        ملاحظات الاشتراطات الميدانية والتوصيات:
+                    </h3>
+                    <div id="reportAdditionalNotes" class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs leading-relaxed text-slate-800 whitespace-pre-wrap min-h-[50px]">
+                        لا توجد ملاحظات إضافية.
+                    </div>
+                </div>
+
+                <!-- Signatures Section -->
+                <div class="mt-8 pt-4 border-t border-slate-200 grid grid-cols-2 text-center text-xs text-slate-700">
+                    <div>
+                        <p class="font-bold text-slate-900">اعتماد مهندس المعاينة (ERA Solutions)</p>
+                        <p class="mt-6 text-slate-400">......................................................</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-900">توقيع موافقة العميل</p>
+                        <p class="mt-6 text-slate-400">......................................................</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- History / Local Database Modal -->
+    <div id="historyModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-era-card border border-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl p-6 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-database text-era-gold"></i>
+                    سجلات المعاينات المحفوظة (Saved Surveys Database)
+                </h3>
+                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto flex-grow space-y-3" id="savedSurveysList">
+                <!-- Dynamic Saved Surveys Items -->
+            </div>
+
+            <div class="border-t border-slate-800 pt-3 flex justify-end">
+                <button onclick="closeHistoryModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-era-dark text-slate-400 text-xs py-4 text-center border-t border-slate-800 no-print mt-8">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <img src="https://lh3.googleusercontent.com/d/1Rsn8lWfVI492q9HtsHTBlk6cjzKTolFN" 
+                     onerror="this.src='https://drive.google.com/uc?export=view&id=1Rsn8lWfVI492q9HtsHTBlk6cjzKTolFN';" 
+                     alt="Era Solutions Logo" class="h-6 w-auto object-contain">
+                <span class="font-bold text-era-gold">ERA Solutions</span>
+                <span>- Smart Home & Automation Survey Tool</span>
+            </div>
+            <p>© 2026 جميع الحقوق محفوظة لشركة ERA Solutions</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastMessage" class="text-xs font-bold">تم تنفيذ الإجراء بنجاح</span>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script>
+        // Preset Zones
+        const DEFAULT_APARTMENT_ZONES = [
+            "Entrance Lobby", "Reception", "Dining Room", "Living Room", 
+            "Corridor", "Bathroom 1", "Bathroom 2", "Guest Bathroom", 
+            "Kitchen", "Bedroom 1", "Bedroom 2", "Bedroom 3", 
+            "Master Bedroom", "Master Dressing", "Master Bathroom"
+        ];
+
+        const SENSORS_LIST = [
+            "Smart Motion Sensor", "Not Smart Motion Sensor", "Presence Sensor", 
+            "Door Contact", "Gas Sensor", "Water Sensor", "Gas Valve", "Water Valve"
+        ];
+
+        const TOUCH_SCREENS = ["None", '4" Screen', '5" Screen', '8" Screen', '10" Screen'];
+        const VOICE_CONTROLS = ["None", "Alexa Pop", "Alexa Dot", "Alexa Show 5", "Alexa Show 8", "Alexa Show 11"];
+        const NETWORK_SOLUTIONS = ["Zigbee Hub", "Zigbee Repeater", "Ceiling AP", "Desktop AP"];
+        const SPEAKER_TYPES = ["3W Speaker", "6W Speaker", "10W Speaker", "20W Speaker"];
+
+        // Application State Variables
+        let currentStep = 1;
+        let selectedZones = [...DEFAULT_APARTMENT_ZONES];
+        let activeZoneTab = DEFAULT_APARTMENT_ZONES[0] || "";
+        let zoneConfigurations = {};
+
+        // Window Init
+        window.onload = function() {
+            loadFromLocalStorage();
+            renderZonesChecklist();
+            initializeZoneConfigurations();
+            renderZoneTabs();
+            updateStepUI();
+        };
+
+        function switchStep(stepNumber) {
+            currentStep = stepNumber;
+            
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step-${stepNumber}`).classList.remove('hidden');
+
+            if (stepNumber === 3) {
+                renderZoneTabs();
+                renderActiveZoneForm();
+            } else if (stepNumber === 4) {
+                generateSummaryTable();
+            }
+
+            updateStepUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateStepUI() {
+            for (let i = 1; i <= 4; i++) {
+                const icon = document.getElementById(`step-icon-${i}`);
+                const btnSpan = document.getElementById(`step-btn-${i}`).querySelector('span');
+                const connector = document.getElementById(`connector-${i}`);
+
+                if (i < currentStep) {
+                    icon.className = "w-10 h-10 rounded-xl bg-emerald-500 text-era-dark font-extrabold flex items-center justify-center shadow-lg transition-all";
+                    icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    btnSpan.className = "text-xs font-bold text-emerald-400";
+                    if (connector) connector.className = "flex-1 h-0.5 bg-emerald-500 -mx-2 transition-colors";
+                } else if (i === currentStep) {
+                    icon.className = "w-10 h-10 rounded-xl bg-era-gold text-era-dark font-extrabold flex items-center justify-center shadow-lg shadow-era-gold/20 ring-4 ring-era-gold/20 transition-all";
+                    icon.innerHTML = i;
+                    btnSpan.className = "text-xs font-bold text-era-gold";
+                    if (connector) connector.className = "flex-1 h-0.5 bg-slate-800 -mx-2 transition-colors";
+                } else {
+                    icon.className = "w-10 h-10 rounded-xl bg-slate-800 text-slate-500 font-bold flex items-center justify-center shadow-sm transition-all";
+                    icon.innerHTML = i;
+                    btnSpan.className = "text-xs font-medium text-slate-500";
+                    if (connector) connector.className = "flex-1 h-0.5 bg-slate-800 -mx-2 transition-colors";
+                }
+            }
+        }
+
+        // Unit Selection Switch Handler
+        function handleUnitTypeChange() {
+            const unitType = document.getElementById('unitType').value;
+            if (unitType === "Apartment") {
+                selectedZones = [...DEFAULT_APARTMENT_ZONES];
+            } else if (unitType === "Duplex") {
+                selectedZones = [...DEFAULT_APARTMENT_ZONES, "First Floor Corridor", "Staircase", "Upper Living Room"];
+            } else if (unitType.includes("Villa")) {
+                selectedZones = [...DEFAULT_APARTMENT_ZONES, "Garden", "Garage", "Roof", "Terrace", "Driver Room", "Maid Room"];
+            }
+            renderZonesChecklist();
+            initializeZoneConfigurations();
+        }
+
+        function renderZonesChecklist() {
+            const grid = document.getElementById('zonesGrid');
+            grid.innerHTML = "";
+
+            selectedZones.forEach(zone => {
+                const card = document.createElement('label');
+                card.className = "flex items-center space-x-3 space-x-reverse p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-era-cyan/50 hover:bg-slate-900/80 transition group";
+                
+                card.innerHTML = `
+                    <input type="checkbox" value="${zone}" checked onchange="toggleZone('${zone}', this.checked)" class="w-4 h-4 text-era-cyan rounded border-slate-700 bg-slate-950 focus:ring-era-cyan">
+                    <span class="text-xs font-bold text-slate-300 group-hover:text-white">${zone}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleZone(zoneName, isChecked) {
+            if (isChecked) {
+                if (!selectedZones.includes(zoneName)) selectedZones.push(zoneName);
+            } else {
+                selectedZones = selectedZones.filter(z => z !== zoneName);
+            }
+            initializeZoneConfigurations();
+            autoSave();
+        }
+
+        function selectAllZones(status) {
+            const checkboxes = document.querySelectorAll('#zonesGrid input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = status;
+                toggleZone(cb.value, status);
+            });
+        }
+
+        function addCustomZone() {
+            const input = document.getElementById('customZoneInput');
+            const zoneName = input.value.trim();
+            if (zoneName && !selectedZones.includes(zoneName)) {
+                selectedZones.push(zoneName);
+                input.value = "";
+                renderZonesChecklist();
+                initializeZoneConfigurations();
+                showToast("تمت إضافة المنطقة بنجاح");
+                autoSave();
+            }
+        }
+
+        function validateAndProceedToStep3() {
+            if (selectedZones.length === 0) {
+                showToast("يرجى اختيار منطقة واحدة على الأقل للاستمرار", "error");
+                return;
+            }
+            activeZoneTab = selectedZones[0];
+            switchStep(3);
+        }
+
+        // Initialize configurations for each zone
+        function initializeZoneConfigurations() {
+            selectedZones.forEach(zone => {
+                if (!zoneConfigurations[zone]) {
+                    zoneConfigurations[zone] = {
+                        lightingLines: 0,
+                        wallBoxes: 0,
+                        bedPanels: 0,
+                        shutters: 0,
+                        curtains: 0,
+                        curtainTrackMeters: 0,
+                        ac: 0,
+                        sensors: [],
+                        touchScreen: "None",
+                        voiceControl: "None",
+                        networkSolutions: [],
+                        soundSystem: {
+                            required: "No",
+                            speakerType: "3W Speaker",
+                            noOfSpeakers: 0,
+                            amplifier: "No",
+                            mergedIntoAnotherZone: "No"
+                        }
+                    };
+                }
+            });
+        }
+
+        function renderZoneTabs() {
+            const tabsList = document.getElementById('zoneTabsList');
+            tabsList.innerHTML = "";
+
+            selectedZones.forEach(zone => {
+                const isActive = zone === activeZoneTab;
+                const tabBtn = document.createElement('button');
+                tabBtn.className = `px-4 py-2.5 text-xs font-bold rounded-t-xl whitespace-nowrap transition-all border-t border-x ${
+                    isActive 
+                    ? 'bg-era-card text-era-gold border-slate-700 border-b-2 border-b-era-gold' 
+                    : 'bg-slate-950 text-slate-400 border-transparent hover:bg-slate-900'
+                }`;
+                tabBtn.innerText = zone;
+                tabBtn.onclick = () => {
+                    activeZoneTab = zone;
+                    renderZoneTabs();
+                    renderActiveZoneForm();
+                };
+                tabsList.appendChild(tabBtn);
+            });
+        }
+
+        function createNumericOptions(max, selectedVal = 0) {
+            let options = "";
+            for (let i = 0; i <= max; i++) {
+                options += `<option value="${i}" ${i == selectedVal ? 'selected' : ''}>${i}</option>`;
+            }
+            return options;
+        }
+
+        function renderActiveZoneForm() {
+            const container = document.getElementById('zoneTabContent');
+            const zoneData = zoneConfigurations[activeZoneTab];
+
+            if (!zoneData) return;
+
+            const isLightingActive = zoneData.lightingLines > 0;
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-door-open text-era-cyan"></i>
+                            تفاصيل منطقة: <span class="text-era-gold">${activeZoneTab}</span>
+                        </h3>
+                        <span class="text-[11px] bg-slate-900 text-slate-400 px-3 py-1 rounded-full border border-slate-800">ERA Zone Inspection</span>
+                    </div>
+
+                    <!-- Lighting & Wall Boxes Row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1.5">No. Of Lighting Lines (خطوط الإضاءة)</label>
+                            <select onchange="updateZoneField('${activeZoneTab}', 'lightingLines', parseInt(this.value)); renderActiveZoneForm();" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold">
+                                ${createNumericOptions(20, zoneData.lightingLines)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold ${isLightingActive ? 'text-slate-300' : 'text-slate-600'} mb-1.5">
+                                No. Of Wall Boxes (العلب الجدارية) 
+                                ${!isLightingActive ? '<span class="text-[10px] text-amber-500">(يتطلب إضاءة > 0)</span>' : ''}
+                            </label>
+                            <select ${!isLightingActive ? 'disabled' : ''} onchange="updateZoneField('${activeZoneTab}', 'wallBoxes', parseInt(this.value))" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold disabled:opacity-40 disabled:bg-slate-950">
+                                ${createNumericOptions(20, zoneData.wallBoxes)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1.5">Beside Bed Panels (مفاتيح بجانب السرير)</label>
+                            <select onchange="updateZoneField('${activeZoneTab}', 'bedPanels', parseInt(this.value))" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold">
+                                ${createNumericOptions(20, zoneData.bedPanels)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Shutters, Curtains & Tracks Row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1.5">No. Of Shutters (الشترات)</label>
+                            <select onchange="updateZoneField('${activeZoneTab}', 'shutters', parseInt(this.value))" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold">
+                                ${createNumericOptions(20, zoneData.shutters)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1.5">No. Of Curtains (الستائر)</label>
+                            <select onchange="updateZoneField('${activeZoneTab}', 'curtains', parseInt(this.value))" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold">
+                                ${createNumericOptions(20, zoneData.curtains)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1.5">Curtain Track Meters (أمتار مجرى الستارة)</label>
+                            <select onchange="updateZoneField('${activeZoneTab}', 'curtainTrackMeters', parseInt(this.value))" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold">
+                                ${createNumericOptions(50, zoneData.curtainTrackMeters)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1.5">No. Of AC Units (التكييف)</label>
+                            <select onchange="updateZoneField('${activeZoneTab}', 'ac', parseInt(this.value))" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold">
+                                ${createNumericOptions(20, zoneData.ac)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Sensors Checklist -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <label class="block text-xs font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-era-cyan"></i>
+                            الحساسات المطلوبة للفراغ (Sensors Checklist)
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            ${SENSORS_LIST.map(sensor => {
+                                const isChecked = zoneData.sensors.includes(sensor);
+                                return `
+                                    <label class="flex items-center space-x-2 space-x-reverse text-xs bg-slate-900 p-2.5 rounded-lg border border-slate-800 cursor-pointer hover:border-era-cyan/40">
+                                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleSensor('${activeZoneTab}', '${sensor}', this.checked)" class="w-4 h-4 text-era-cyan rounded bg-slate-950 border-slate-700">
+                                        <span class="text-slate-300 font-medium">${sensor}</span>
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Touch Screen & Voice Control -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1.5">Touch Screen (شاشة اللمس)</label>
+                            <select onchange="updateZoneField('${activeZoneTab}', 'touchScreen', this.value)" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold">
+                                ${TOUCH_SCREENS.map(ts => `<option value="${ts}" ${zoneData.touchScreen === ts ? 'selected' : ''}>${ts}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1.5">Voice Control (التحكم الصوتي)</label>
+                            <select onchange="updateZoneField('${activeZoneTab}', 'voiceControl', this.value)" class="w-full p-2.5 bg-slate-900 border border-slate-700 text-white rounded-lg text-xs focus:ring-2 focus:ring-era-gold">
+                                ${VOICE_CONTROLS.map(vc => `<option value="${vc}" ${zoneData.voiceControl === vc ? 'selected' : ''}>${vc}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Network Solutions Multi-select -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <label class="block text-xs font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-wifi text-era-cyan"></i>
+                            حلول الشبكة لهذا الفراغ (Network Solutions)
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            ${NETWORK_SOLUTIONS.map(net => {
+                                const isChecked = zoneData.networkSolutions.includes(net);
+                                return `
+                                    <label class="flex items-center space-x-2 space-x-reverse text-xs bg-slate-900 p-2.5 rounded-lg border border-slate-800 cursor-pointer hover:border-era-cyan/40">
+                                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleNetwork('${activeZoneTab}', '${net}', this.checked)" class="w-4 h-4 text-era-cyan rounded bg-slate-950 border-slate-700">
+                                        <span class="text-slate-300 font-medium">${net}</span>
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Sound System Config -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <div class="flex items-center justify-between mb-4">
+                            <label class="text-xs font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-volume-high text-era-cyan"></i>
+                                النظام الصوتي (Sound System)
+                            </label>
+                            <div class="flex items-center gap-4 text-xs font-semibold">
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <input type="radio" name="soundReq_${activeZoneTab}" value="Yes" ${zoneData.soundSystem.required === 'Yes' ? 'checked' : ''} onchange="updateSoundSystem('${activeZoneTab}', 'required', 'Yes'); renderActiveZoneForm();" class="text-era-cyan"> نعم (Yes)
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <input type="radio" name="soundReq_${activeZoneTab}" value="No" ${zoneData.soundSystem.required === 'No' ? 'checked' : ''} onchange="updateSoundSystem('${activeZoneTab}', 'required', 'No'); renderActiveZoneForm();" class="text-era-cyan"> لا (No)
+                                </label>
+                            </div>
+                        </div>
+
+                        ${zoneData.soundSystem.required === 'Yes' ? `
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-900 p-4 rounded-lg border border-slate-800 mt-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Speaker Type</label>
+                                    <select onchange="updateSoundSystem('${activeZoneTab}', 'speakerType', this.value)" class="w-full p-2 bg-slate-950 border border-slate-700 text-white rounded-lg text-xs">
+                                        ${SPEAKER_TYPES.map(st => `<option value="${st}" ${zoneData.soundSystem.speakerType === st ? 'selected' : ''}>${st}</option>`).join('')}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">No. Of Speakers</label>
+                                    <select onchange="updateSoundSystem('${activeZoneTab}', 'noOfSpeakers', parseInt(this.value))" class="w-full p-2 bg-slate-950 border border-slate-700 text-white rounded-lg text-xs">
+                                        ${createNumericOptions(10, zoneData.soundSystem.noOfSpeakers)}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Amplifier For Zone?</label>
+                                    <select onchange="updateSoundSystem('${activeZoneTab}', 'amplifier', this.value)" class="w-full p-2 bg-slate-950 border border-slate-700 text-white rounded-lg text-xs">
+                                        <option value="Yes" ${zoneData.soundSystem.amplifier === 'Yes' ? 'selected' : ''}>Yes</option>
+                                        <option value="No" ${zoneData.soundSystem.amplifier === 'No' ? 'selected' : ''}>No</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-300 mb-1">Merged Into Zone?</label>
+                                    <select onchange="updateSoundSystem('${activeZoneTab}', 'mergedIntoAnotherZone', this.value)" class="w-full p-2 bg-slate-950 border border-slate-700 text-white rounded-lg text-xs">
+                                        <option value="Yes" ${zoneData.soundSystem.mergedIntoAnotherZone === 'Yes' ? 'selected' : ''}>Yes</option>
+                                        <option value="No" ${zoneData.soundSystem.mergedIntoAnotherZone === 'No' ? 'selected' : ''}>No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateZoneField(zone, field, value) {
+            zoneConfigurations[zone][field] = value;
+            autoSave();
+        }
+
+        function toggleSensor(zone, sensor, isChecked) {
+            let list = zoneConfigurations[zone].sensors;
+            if (isChecked) {
+                if (!list.includes(sensor)) list.push(sensor);
+            } else {
+                zoneConfigurations[zone].sensors = list.filter(s => s !== sensor);
+            }
+            autoSave();
+        }
+
+        function toggleNetwork(zone, network, isChecked) {
+            let list = zoneConfigurations[zone].networkSolutions;
+            if (isChecked) {
+                if (!list.includes(network)) list.push(network);
+            } else {
+                zoneConfigurations[zone].networkSolutions = list.filter(n => n !== network);
+            }
+            autoSave();
+        }
+
+        function updateSoundSystem(zone, field, value) {
+            zoneConfigurations[zone].soundSystem[field] = value;
+            autoSave();
+        }
+
+        function generateSummaryTable() {
+            const tbody = document.getElementById('summaryTableBody');
+            const tfoot = document.getElementById('summaryTableFoot');
+            const engName = document.getElementById('engineerName').value || "مهندس المعاينة";
+            const clientName = document.getElementById('clientName').value || "غير محدد";
+            const unitAddress = document.getElementById('unitAddress').value || "غير محدد";
+            const unitType = document.getElementById('unitType').value;
+            const additionalNotes = document.getElementById('additionalNotes').value;
+
+            document.getElementById('reportEngineerName').innerText = engName;
+            document.getElementById('reportClientName').innerText = clientName;
+            document.getElementById('reportUnitAddress').innerText = unitAddress;
+            document.getElementById('reportUnitType').innerText = unitType;
+            document.getElementById('reportDate').innerText = new Date().toLocaleDateString('ar-EG');
+            document.getElementById('reportAdditionalNotes').innerText = additionalNotes || "لا توجد ملاحظات إضافية.";
+
+            tbody.innerHTML = "";
+            
+            let totals = {
+                lightingLines: 0,
+                wallBoxes: 0,
+                bedPanels: 0,
+                shutters: 0,
+                curtains: 0,
+                curtainTrackMeters: 0,
+                ac: 0,
+                sensorsCount: 0,
+                touchScreensCount: 0,
+                speakersCount: 0
+            };
+
+            selectedZones.forEach(zone => {
+                const z = zoneConfigurations[zone];
+                if (!z) return;
+
+                totals.lightingLines += z.lightingLines || 0;
+                totals.wallBoxes += z.wallBoxes || 0;
+                totals.bedPanels += z.bedPanels || 0;
+                totals.shutters += z.shutters || 0;
+                totals.curtains += z.curtains || 0;
+                totals.curtainTrackMeters += z.curtainTrackMeters || 0;
+                totals.ac += z.ac || 0;
+                totals.sensorsCount += z.sensors.length;
+                if (z.touchScreen !== "None") totals.touchScreensCount += 1;
+                if (z.soundSystem.required === "Yes") totals.speakersCount += (z.soundSystem.noOfSpeakers || 0);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 text-center";
+                tr.innerHTML = `
+                    <td class="p-2 border border-slate-300 font-bold text-slate-900">${zone}</td>
+                    <td class="p-2 border border-slate-300">${z.lightingLines} L / ${z.wallBoxes} W</td>
+                    <td class="p-2 border border-slate-300">${z.bedPanels}</td>
+                    <td class="p-2 border border-slate-300">${z.shutters} Sh / ${z.curtains} Cu</td>
+                    <td class="p-2 border border-slate-300">${z.curtainTrackMeters} m</td>
+                    <td class="p-2 border border-slate-300">${z.ac}</td>
+                    <td class="p-2 border border-slate-300 text-[10px]">${z.sensors.length > 0 ? z.sensors.join(', ') : '-'}</td>
+                    <td class="p-2 border border-slate-300">${z.touchScreen} / ${z.voiceControl}</td>
+                    <td class="p-2 border border-slate-300 text-[10px]">${z.networkSolutions.length > 0 ? z.networkSolutions.join(', ') : '-'}</td>
+                    <td class="p-2 border border-slate-300 text-[10px]">${z.soundSystem.required === 'Yes' ? `${z.soundSystem.noOfSpeakers}x${z.soundSystem.speakerType}` : 'No'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            tfoot.innerHTML = `
+                <tr class="bg-slate-200 text-slate-950 font-black text-center">
+                    <td class="p-2 border border-slate-400">الإجمالي الشامل (Totals)</td>
+                    <td class="p-2 border border-slate-400">${totals.lightingLines} L / ${totals.wallBoxes} W</td>
+                    <td class="p-2 border border-slate-400">${totals.bedPanels}</td>
+                    <td class="p-2 border border-slate-400">${totals.shutters} Sh / ${totals.curtains} Cu</td>
+                    <td class="p-2 border border-slate-400">${totals.curtainTrackMeters} m</td>
+                    <td class="p-2 border border-slate-400">${totals.ac} AC</td>
+                    <td class="p-2 border border-slate-400">${totals.sensorsCount} Sensors</td>
+                    <td class="p-2 border border-slate-400">${totals.touchScreensCount} Screens</td>
+                    <td class="p-2 border border-slate-400">-</td>
+                    <td class="p-2 border border-slate-400">${totals.speakersCount} Speakers</td>
+                </tr>
+            `;
+        }
+
+        function exportToPDF() {
+            generateSummaryTable();
+            const element = document.getElementById('pdfExportContainer');
+            const clientName = document.getElementById('clientName').value || "ERA_Survey";
+            
+            const opt = {
+                margin:       [0.2, 0.2, 0.2, 0.2],
+                filename:     `ERA_Solutions_Survey_${clientName.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            showToast("جاري إعداد تقرير PDF لشركة ERA Solutions...");
+            html2pdf().set(opt).from(element).save().then(() => {
+                showToast("تم تصدير ملف PDF بنجاح");
+            });
+        }
+
+        function autoSave() {
+            const state = {
+                engineerName: document.getElementById('engineerName').value,
+                clientName: document.getElementById('clientName').value,
+                unitAddress: document.getElementById('unitAddress').value,
+                unitType: document.getElementById('unitType').value,
+                additionalNotes: document.getElementById('additionalNotes').value,
+                selectedZones: selectedZones,
+                zoneConfigurations: zoneConfigurations
+            };
+            localStorage.setItem('era_smart_survey_draft', JSON.stringify(state));
+        }
+
+        function saveToLocalStorage(manual = false) {
+            autoSave();
+            if (manual) showToast("تم حفظ مسودة المعاينة بنجاح");
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('era_smart_survey_draft');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.engineerName) document.getElementById('engineerName').value = parsed.engineerName;
+                    if (parsed.clientName) document.getElementById('clientName').value = parsed.clientName;
+                    if (parsed.unitAddress) document.getElementById('unitAddress').value = parsed.unitAddress;
+                    if (parsed.unitType) document.getElementById('unitType').value = parsed.unitType;
+                    if (parsed.additionalNotes) document.getElementById('additionalNotes').value = parsed.additionalNotes;
+                    if (parsed.selectedZones) selectedZones = parsed.selectedZones;
+                    if (parsed.zoneConfigurations) zoneConfigurations = parsed.zoneConfigurations;
+                } catch(e) {
+                    console.error("Error loading draft", e);
+                }
+            }
+        }
+
+        function saveCurrentSurveyToDatabase() {
+            const clientName = document.getElementById('clientName').value;
+            if (!clientName) {
+                showToast("يرجى إدخال اسم العميل قبل الحفظ بقاعدة البيانات", "error");
+                return;
+            }
+
+            const surveyData = {
+                id: 'era_' + Date.now(),
+                timestamp: new Date().toLocaleString('ar-EG'),
+                engineerName: document.getElementById('engineerName').value,
+                clientName: clientName,
+                unitAddress: document.getElementById('unitAddress').value,
+                unitType: document.getElementById('unitType').value,
+                additionalNotes: document.getElementById('additionalNotes').value,
+                selectedZones: selectedZones,
+                zoneConfigurations: zoneConfigurations
+            };
+
+            let database = JSON.parse(localStorage.getItem('era_surveys_db') || '[]');
+            database.unshift(surveyData);
+            localStorage.setItem('era_surveys_db', JSON.stringify(database));
+
+            showToast("تم حفظ المعاينة بالسجلات المحفوظة بنجاح");
+        }
+
+        function openHistoryModal() {
+            const list = document.getElementById('savedSurveysList');
+            const database = JSON.parse(localStorage.getItem('era_surveys_db') || '[]');
+
+            if (database.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">لا توجد معاينات محفوظة في قاعدة البيانات حتى الآن.</div>`;
+            } else {
+                list.innerHTML = database.map((item, index) => `
+                    <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-bold text-white text-sm">${item.clientName}</h4>
+                                <span class="text-[10px] bg-era-gold/20 text-era-gold px-2 py-0.5 rounded border border-era-gold/30">${item.unitType}</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1">المهندس: ${item.engineerName || 'غير محدد'} | التاريخ: ${item.timestamp}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="loadSurveyFromDb('${item.id}')" class="px-3 py-1.5 bg-era-cyan hover:bg-era-cyanHover text-era-dark font-extrabold text-xs rounded-lg transition">تحميل</button>
+                            <button onclick="deleteSurveyFromDb('${item.id}')" class="px-2.5 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('historyModal').classList.remove('hidden');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.add('hidden');
+        }
+
+        function loadSurveyFromDb(id) {
+            const database = JSON.parse(localStorage.getItem('era_surveys_db') || '[]');
+            const survey = database.find(item => item.id === id);
+            if (survey) {
+                document.getElementById('engineerName').value = survey.engineerName || "";
+                document.getElementById('clientName').value = survey.clientName || "";
+                document.getElementById('unitAddress').value = survey.unitAddress || "";
+                document.getElementById('unitType').value = survey.unitType || "Apartment";
+                document.getElementById('additionalNotes').value = survey.additionalNotes || "";
+                selectedZones = survey.selectedZones || [];
+                zoneConfigurations = survey.zoneConfigurations || {};
+
+                renderZonesChecklist();
+                closeHistoryModal();
+                switchStep(1);
+                showToast("تم تحميل بيانات المعاينة بنجاح");
+            }
+        }
+
+        function deleteSurveyFromDb(id) {
+            let database = JSON.parse(localStorage.getItem('era_surveys_db') || '[]');
+            database = database.filter(item => item.id !== id);
+            localStorage.setItem('era_surveys_db', JSON.stringify(database));
+            openHistoryModal();
+            showToast("تم حذف المعاينة من السجلات");
+        }
+
+        function clearFormWithConfirmation() {
+            if (confirm("هل أنت تأكد من مسح كافة البيانات الحالية وبدء معاينة جديدة لـ ERA Solutions؟")) {
+                localStorage.removeItem('era_smart_survey_draft');
+                location.reload();
+            }
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = message;
+            if (type === "error") {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-red-400 text-lg";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-lg";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
